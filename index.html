@@ -157,7 +157,8 @@ async function addProduct() {
   if (!name || isNaN(qty) || !expirationDate) {
     return alert("Remplis tous les champs !");
   }
-
+const addBeep = document.getElementById("addSound");
+if (addBeep) addBeep.play();
   await addDoc(fridgeRef, {
     name,
     qty,
@@ -258,5 +259,6 @@ window.startScanner = startScanner;
 
   </script>
   <audio id="beepSound" src="sounds/Blop.mp3" preload="auto"></audio>
+  <audio id="addSound" src="sounds/confirm.mp3" preload="auto"></audio>
 </body>
 </html>
