@@ -18,9 +18,21 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const firebaseConfig = {
-      // 👉 Remplis avec tes données Firebase
-    };
+   const firebaseConfig = {
+
+  apiKey: "AIzaSyCX1T2-lVJsT3PgyXoEiEteXytl-d84C74",
+
+  authDomain: "veenacore-smartfridge.firebaseapp.com",
+
+  projectId: "veenacore-smartfridge",
+
+  storageBucket: "veenacore-smartfridge.firebasestorage.app",
+
+  messagingSenderId: "754721529662",
+
+  appId: "1:754721529662:web:b8886c63353e8ecbd5966f"
+
+};
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
