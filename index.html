@@ -10,7 +10,7 @@
 <input type="text" id="productName" placeholder="Nom du produit">
 <input type="number" id="productQty" placeholder="Quantité" min="1">
 <input type="date" id="productDate" placeholder="Date de péremption">
-<button onclick="addProduct()">➕ Ajouter</button>
+<button id="addBtn">➕ Ajouter</button>
 
 
   <ul id="productList"></ul>
@@ -74,6 +74,7 @@
 
         li.appendChild(btn);
         list.appendChild(li);
+        document.getElementById("addBtn").addEventListener("click", addProduct);
       });
     });
   </script>
