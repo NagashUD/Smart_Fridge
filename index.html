@@ -190,35 +190,77 @@ onSnapshot(fridgeRef, (snapshot) => {
   snapshot.forEach((docSnap) => {
     count++;
     const data = docSnap.data();
-    const li = document.createElement("li");
+ const li = document.createElement("li");
 
-    const today = new Date();
-    const expDate = new Date(data.expirationDate);
-    const diffTime = expDate - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+const today = new Date();
+const expDate = new Date(data.expirationDate);
+const diffTime = expDate - today;
+const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    let classe = "";
-    if (diffDays <= 0) classe = "perime";
-    else if (diffDays <= 3) classe = "bientot";
+let classe = "";
+if (diffDays <= 0) classe = "perime";
+else if (diffDays <= 3) classe = "bientot";
 
-    let status = "";
-    if (diffDays > 0) {
-      status = `dans ${diffDays} jour${diffDays > 1 ? "s" : ""}`;
-    } else if (diffDays === 0) {
-      status = `aujourd'hui`;
-    } else {
-      status = `il y a ${Math.abs(diffDays)} jour${Math.abs(diffDays) > 1 ? "s" : ""}`;
-    }
+let status = "";
+if (diffDays > 0) {
+  status = `dans ${diffDays} jour${diffDays > 1 ? "s" : ""}`;
+} else if (diffDays === 0) {
+  status = `aujourd'hui`;
+} else {
+  status = `il y a ${Math.abs(diffDays)} jour${Math.abs(diffDays) > 1 ? "s" : ""}`;
+}
 
-    li.className = classe;
-    li.textContent = `${data.name} (${data.qty}) - périme ${status}`;
+li.className = classe;
+li.textContent = `${data.name} (${data.qty}) - périme ${status} `;
 
-    const btn = document.createElement("button");
-    btn.textContent = "🗑️ Retirer";
-    btn.onclick = () => deleteProduct(docSnap.id);
+// 🔘 Boutons + et −
+const btnGroup = document.createElement("span");
+btnGroup.style.marginLeft = "10px";
 
-    li.appendChild(btn);
-    list.appendChild(li);
+const minusBtn = document.createElement("button");
+minusBtn.textContent = "−";
+minusBtn.onclick = async () => {
+  const decBeep = document.getElementById("decSound");
+  if (decBeep) {
+    decBeep.currentTime = 0;
+    decBeep.play();
+  }
+
+  if (data.qty > 1) {
+    await updateDoc(doc(db, "smartfridge", docSnap.id), {
+      qty: data.qty - 1,
+    });
+  } else {
+    await deleteProduct(docSnap.id);
+  }
+};
+
+const plusBtn = document.createElement("button");
+plusBtn.textContent = "+";
+plusBtn.onclick = async () => {
+  const incBeep = document.getElementById("incSound");
+  if (incBeep) {
+    incBeep.currentTime = 0;
+    incBeep.play();
+  }
+
+  await updateDoc(doc(db, "smartfridge", docSnap.id), {
+    qty: data.qty + 1,
+  });
+};
+
+btnGroup.appendChild(minusBtn);
+btnGroup.appendChild(plusBtn);
+li.appendChild(btnGroup);
+
+// 🗑️ Bouton supprimer
+const btn = document.createElement("button");
+btn.textContent = "🗑️ Retirer";
+btn.onclick = () => deleteProduct(docSnap.id);
+li.appendChild(btn);
+
+list.appendChild(li);
+
   });
 
   // 🧊 Mise à jour du compteur
@@ -273,5 +315,7 @@ window.startScanner = startScanner;
   <audio id="beepSound" src="sounds/Blop.mp3" preload="auto"></audio>
   <audio id="addSound" src="sounds/confirm.mp3" preload="auto"></audio>
   <audio id="removeSound" src="sounds/remove.mp3" preload="auto"></audio>
+  <audio id="incSound" src="sounds/inc.mp3" preload="auto"></audio>
+<audio id="decSound" src="sounds/dec.mp3" preload="auto"></audio>
 </body>
 </html>
