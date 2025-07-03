@@ -7,9 +7,11 @@
 <body>
   <h1>🧊 VeeNa_Core SmartFridge v0.1</h1>
 
-  <input type="text" id="productName" placeholder="Nom du produit">
-  <input type="number" id="productQty" placeholder="Quantité" min="1">
-  <button onclick="addProduct()">➕ Ajouter</button>
+<input type="text" id="productName" placeholder="Nom du produit">
+<input type="number" id="productQty" placeholder="Quantité" min="1">
+<input type="date" id="productDate" placeholder="Date de péremption">
+<button onclick="addProduct()">➕ Ajouter</button>
+
 
   <ul id="productList"></ul>
 
@@ -41,13 +43,17 @@
     async function addProduct() {
       const name = document.getElementById("productName").value.trim();
       const qty = parseInt(document.getElementById("productQty").value.trim(), 10);
+      const expirationDate = document.getElementById("productDate").value;
 
-      if (!name || isNaN(qty)) return alert("Remplis les deux champs !");
+      if (!name || isNaN(qty) || !expirationDate) {
+  return alert("Remplis tous les champs !");
+}
 
-      await addDoc(fridgeRef, { name, qty });
-      document.getElementById("productName").value = "";
-      document.getElementById("productQty").value = "";
-    }
+ await addDoc(fridgeRef, {
+  name,
+  qty,
+  expirationDate
+});
 
     async function deleteProduct(id) {
       await deleteDoc(doc(db, "smartfridge", id));
@@ -60,7 +66,7 @@
       snapshot.forEach((docSnap) => {
         const data = docSnap.data();
         const li = document.createElement("li");
-        li.textContent = `${data.name} (${data.qty}) `;
+      li.textContent = `${data.name} (${data.qty}) - périme le ${data.expirationDate}`;
         
         const btn = document.createElement("button");
         btn.textContent = "🗑️ Retirer";
