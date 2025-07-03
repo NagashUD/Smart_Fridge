@@ -77,6 +77,7 @@
 </style>
 
 </head>
+<script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
 <body>
   <h1>🧊 VeeNa_Core SmartFridge v0.1</h1>
 
@@ -84,9 +85,10 @@
 <input type="number" id="productQty" placeholder="Quantité" min="1">
 <input type="date" id="productDate" placeholder="Date de péremption">
 <button id="addBtn">➕ Ajouter</button>
+<button onclick="startScanner()">📷 Scanner code-barres</button>
+<div id="reader" style="width: 300px; margin-top: 1rem;"></div>
 
-
-  <ul id="productList"></ul>
+<ul id="productList"></ul>
 
   <script type="module">
     // ⚠️ À TOI DE CONFIGURER Firestore ici :
@@ -153,7 +155,28 @@ onSnapshot(fridgeRef, (snapshot) => {
 
 document.getElementById("addBtn").addEventListener("click", addProduct);
 
-  
+  function startScanner() {
+  const html5QrCode = new Html5Qrcode("reader");
+
+  html5QrCode.start(
+    { facingMode: "environment" },
+    {
+      fps: 10,
+      qrbox: 250
+    },
+    (decodedText, decodedResult) => {
+      console.log(`Scanned: ${decodedText}`);
+      document.getElementById("productName").value = decodedText;
+      html5QrCode.stop(); // stop after successful scan
+    },
+    (errorMessage) => {
+      // Ignorer les erreurs mineures
+    }
+  ).catch((err) => {
+    console.error("Erreur du scanner :", err);
+  });
+}
+
   </script>
 </body>
 </html>
