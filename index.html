@@ -3,6 +3,79 @@
 <head>
   <meta charset="UTF-8">
   <title>VeeNa_Core SmartFridge v0.1</title>
+  <style>
+
+  body {
+    margin: 0;
+    padding: 2rem;
+    background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+    font-family: 'Orbitron', sans-serif;
+    color: #ffffff;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    color: #00ffe7;
+  }
+
+  input, button {
+    margin: 0.5rem;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+
+  input {
+    background-color: #222;
+    color: #fff;
+    border: 1px solid #555;
+  }
+
+  button {
+    background-color: #00ffe7;
+    color: #000;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  button:hover {
+    background-color: #00bfa6;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 2rem;
+  }
+
+  li {
+    background-color: #1e1e1e;
+    margin: 0.5rem 0;
+    padding: 0.7rem;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  li span {
+    flex-grow: 1;
+  }
+
+  li button {
+    background-color: #ff4b5c;
+    color: #fff;
+    margin-left: 1rem;
+  }
+
+  li button:hover {
+    background-color: #cc3b4a;
+  }
+</style>
+
 </head>
 <body>
   <h1>🧊 VeeNa_Core SmartFridge v0.1</h1>
@@ -36,47 +109,51 @@
 
 };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const fridgeRef = collection(db, "smartfridge");
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const fridgeRef = collection(db, "smartfridge");
 
-    async function addProduct() {
-      const name = document.getElementById("productName").value.trim();
-      const qty = parseInt(document.getElementById("productQty").value.trim(), 10);
-      const expirationDate = document.getElementById("productDate").value;
+async function addProduct() {
+  const name = document.getElementById("productName").value.trim();
+  const qty = parseInt(document.getElementById("productQty").value.trim(), 10);
+  const expirationDate = document.getElementById("productDate").value;
 
-      if (!name || isNaN(qty) || !expirationDate) {
-  return alert("Remplis tous les champs !");
+  if (!name || isNaN(qty) || !expirationDate) {
+    return alert("Remplis tous les champs !");
+  }
+
+  await addDoc(fridgeRef, {
+    name,
+    qty,
+    expirationDate
+  });
+} // 👈 FIN de la fonction addProduct() ici ✅
+
+async function deleteProduct(id) {
+  await deleteDoc(doc(db, "smartfridge", id));
 }
 
-      await addDoc(fridgeRef, { name, qty });
-        name,
-  qty,
-  expirationDate
-    }
+onSnapshot(fridgeRef, (snapshot) => {
+  const list = document.getElementById("productList");
+  list.innerHTML = "";
 
-    async function deleteProduct(id) {
-      await deleteDoc(doc(db, "smartfridge", id));
-    }
+  snapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+    const li = document.createElement("li");
+    li.textContent = `${data.name} (${data.qty}) - périme le ${data.expirationDate}`;
 
-    onSnapshot(fridgeRef, (snapshot) => {
-      const list = document.getElementById("productList");
-      list.innerHTML = "";
+    const btn = document.createElement("button");
+    btn.textContent = "🗑️ Retirer";
+    btn.onclick = () => deleteProduct(docSnap.id);
 
-      snapshot.forEach((docSnap) => {
-        const data = docSnap.data();
-        const li = document.createElement("li");
-       li.textContent = `${data.name} (${data.qty}) - périme le ${data.expirationDate}`;
-        
-        const btn = document.createElement("button");
-        btn.textContent = "🗑️ Retirer";
-        btn.onclick = () => deleteProduct(docSnap.id);
+    li.appendChild(btn);
+    list.appendChild(li);
+  });
+});
 
-        li.appendChild(btn);
-        list.appendChild(li);
-        document.getElementById("addBtn").addEventListener("click", addProduct);
-      });
-    });
+document.getElementById("addBtn").addEventListener("click", addProduct);
+
+  
   </script>
 </body>
 </html>
