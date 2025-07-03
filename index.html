@@ -121,6 +121,7 @@ li {
 <button id="addBtn">➕ Ajouter</button>
 <button onclick="startScanner()">📷 Scanner code-barres</button>
 <div id="reader" style="width: 300px; margin-top: 1rem;"></div>
+<p id="productCount" style="text-align:center; font-weight:bold;">🥶 Produits enregistrés : 0</p>
 
 <ul id="productList"></ul>
 
@@ -180,45 +181,50 @@ onSnapshot(fridgeRef, (snapshot) => {
   const list = document.getElementById("productList");
   list.innerHTML = "";
 
-snapshot.forEach((docSnap) => {
-  const data = docSnap.data();
-  const li = document.createElement("li");
+onSnapshot(fridgeRef, (snapshot) => {
+  const list = document.getElementById("productList");
+  list.innerHTML = "";
 
-  // Vérification de la date
-  const today = new Date();
-  const expDate = new Date(data.expirationDate);
-  const diffTime = expDate - today;
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  let count = 0;
 
-  // Classe d'urgence
-  let classe = "";
-  if (diffDays <= 0) {
-    classe = "perime"; // périmé
-  } else if (diffDays <= 3) {
-    classe = "bientot"; // bientôt périmé
-  }
+  snapshot.forEach((docSnap) => {
+    count++;
+    const data = docSnap.data();
+    const li = document.createElement("li");
 
-  li.className = classe;
+    const today = new Date();
+    const expDate = new Date(data.expirationDate);
+    const diffTime = expDate - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  let status = "";
-if (diffDays > 0) {
-  status = `dans ${diffDays} jour${diffDays > 1 ? "s" : ""}`;
-} else if (diffDays === 0) {
-  status = `aujourd'hui`;
-} else {
-  status = `il y a ${Math.abs(diffDays)} jour${Math.abs(diffDays) > 1 ? "s" : ""}`;
-}
+    let classe = "";
+    if (diffDays <= 0) classe = "perime";
+    else if (diffDays <= 3) classe = "bientot";
 
-li.textContent = `${data.name} (${data.qty}) - périme ${status}`;
+    let status = "";
+    if (diffDays > 0) {
+      status = `dans ${diffDays} jour${diffDays > 1 ? "s" : ""}`;
+    } else if (diffDays === 0) {
+      status = `aujourd'hui`;
+    } else {
+      status = `il y a ${Math.abs(diffDays)} jour${Math.abs(diffDays) > 1 ? "s" : ""}`;
+    }
 
+    li.className = classe;
+    li.textContent = `${data.name} (${data.qty}) - périme ${status}`;
 
-  const btn = document.createElement("button");
-  btn.textContent = "🗑️ Retirer";
-  btn.onclick = () => deleteProduct(docSnap.id);
+    const btn = document.createElement("button");
+    btn.textContent = "🗑️ Retirer";
+    btn.onclick = () => deleteProduct(docSnap.id);
 
-  li.appendChild(btn);
-  list.appendChild(li);
+    li.appendChild(btn);
+    list.appendChild(li);
+  });
+
+  // 🧊 Mise à jour du compteur
+  document.getElementById("productCount").textContent = `🥶 Produits enregistrés : ${count}`;
 });
+
 
 });
 
