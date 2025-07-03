@@ -168,6 +168,12 @@ if (addBeep) addBeep.play();
 
 async function deleteProduct(id) {
   await deleteDoc(doc(db, "smartfridge", id));
+  const removeBeep = document.getElementById("removeSound");
+if (removeBeep) {
+  removeBeep.currentTime = 0;
+  removeBeep.volume = 0.5;
+  removeBeep.play();
+}
 }
 
 onSnapshot(fridgeRef, (snapshot) => {
@@ -260,5 +266,6 @@ window.startScanner = startScanner;
   </script>
   <audio id="beepSound" src="sounds/Blop.mp3" preload="auto"></audio>
   <audio id="addSound" src="sounds/confirm.mp3" preload="auto"></audio>
+  <audio id="removeSound" src="sounds/remove.mp3" preload="auto"></audio>
 </body>
 </html>
