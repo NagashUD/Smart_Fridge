@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VeeNa_Core SmartFridge v0.1</title>
+</head>
+<body>
+  <h1>🧊 VeeNa_Core SmartFridge v0.1</h1>
+
+  <input type="text" id="productName" placeholder="Nom du produit">
+  <input type="number" id="productQty" placeholder="Quantité" min="1">
+  <button onclick="addProduct()">➕ Ajouter</button>
+
+  <ul id="productList"></ul>
+
+  <script type="module">
+    // ⚠️ À TOI DE CONFIGURER Firestore ici :
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      // 👉 Remplis avec tes données Firebase
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const fridgeRef = collection(db, "smartfridge");
+
+    async function addProduct() {
+      const name = document.getElementById("productName").value.trim();
+      const qty = parseInt(document.getElementById("productQty").value.trim(), 10);
+
+      if (!name || isNaN(qty)) return alert("Remplis les deux champs !");
+
+      await addDoc(fridgeRef, { name, qty });
+      document.getElementById("productName").value = "";
+      document.getElementById("productQty").value = "";
+    }
+
+    async function deleteProduct(id) {
+      await deleteDoc(doc(db, "smartfridge", id));
+    }
+
+    onSnapshot(fridgeRef, (snapshot) => {
+      const list = document.getElementById("productList");
+      list.innerHTML = "";
+
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const li = document.createElement("li");
+        li.textContent = `${data.name} (${data.qty}) `;
+        
+        const btn = document.createElement("button");
+        btn.textContent = "🗑️ Retirer";
+        btn.onclick = () => deleteProduct(docSnap.id);
+
+        li.appendChild(btn);
+        list.appendChild(li);
+      });
+    });
+  </script>
+</body>
+</html>
