@@ -6,7 +6,7 @@
   <style>
 
   body {
-    background: url('images/fridge.png') no-repeat center center fixed;
+    background: url('images/fridge2.png') no-repeat center center fixed;
   background-size: cover;
 
     margin: 0;
@@ -15,6 +15,7 @@
     color: #ffffff;
     
   }
+
 
   h1 {
     text-align: center;
@@ -80,13 +81,16 @@
 </style>
 
 </head>
-<script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
+<script src="libs/html5-qrcode.min.js"></script>
 <body>
   <h1>🧊 VeeNa_Core SmartFridge v0.1</h1>
 
 <input type="text" id="productName" placeholder="Nom du produit">
+<p></p>
 <input type="number" id="productQty" placeholder="Quantité" min="1">
+<p></p>
 <input type="date" id="productDate" placeholder="Date de péremption">
+<p></p>
 <button id="addBtn">➕ Ajouter</button>
 <button onclick="startScanner()">📷 Scanner code-barres</button>
 <div id="reader" style="width: 300px; margin-top: 1rem;"></div>
