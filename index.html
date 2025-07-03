@@ -49,11 +49,11 @@
   return alert("Remplis tous les champs !");
 }
 
- await addDoc(fridgeRef, {
-  name,
+      await addDoc(fridgeRef, { name, qty });
+        name,
   qty,
   expirationDate
-});
+    }
 
     async function deleteProduct(id) {
       await deleteDoc(doc(db, "smartfridge", id));
@@ -66,7 +66,7 @@
       snapshot.forEach((docSnap) => {
         const data = docSnap.data();
         const li = document.createElement("li");
-      li.textContent = `${data.name} (${data.qty}) - périme le ${data.expirationDate}`;
+       li.textContent = `${data.name} (${data.qty}) - périme le ${data.expirationDate}`;
         
         const btn = document.createElement("button");
         btn.textContent = "🗑️ Retirer";
