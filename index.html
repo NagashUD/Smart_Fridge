@@ -217,44 +217,46 @@ li.textContent = `${data.name} (${data.qty}) - périme ${status}`;
 
 document.getElementById("addBtn").addEventListener("click", addProduct);
 
-  function startScanner() {
+window.startScanner = function () {
   const html5QrCode = new Html5Qrcode("reader");
 
   html5QrCode.start(
     { facingMode: "environment" },
-    {
-      fps: 10,
-      qrbox: 250
-    },
-    (decodedText, decodedResult) => {
-    fetch(`https://world.openfoodfacts.org/api/v0/product/${decodedText}.json`)
-  .then(res => res.json())
-  .then(data => {
-    if (data.status === 1) {
-      const nom = data.product.product_name_fr || data.product.product_name || "Produit non reconnu";
-      console.log("Produit détecté :", nom);
-      document.getElementById("productName").value = nom;
-    } else {
-      console.log("Produit introuvable dans la base");
-      document.getElementById("productName").value = decodedText;
-    }
-  })
-  .catch(err => {
-    console.error("Erreur API :", err);
-    document.getElementById("productName").value = decodedText;
-  });
+    { fps: 10, qrbox: 250 },
+    (decodedText) => {
+      fetch(`https://world.openfoodfacts.org/api/v0/product/${decodedText}.json`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 1) {
+            const nom = data.product.product_name_fr || data.product.product_name || "Produit non reconnu";
+            document.getElementById("productName").value = nom;
+          } else {
+            document.getElementById("productName").value = decodedText;
+          }
+        })
+        .catch(() => {
+          document.getElementById("productName").value = decodedText;
+        })
+      .finally(() => {
+  const beep = document.getElementById("beepSound");
+  if (beep) beep.play();
 
+  html5QrCode.stop().then(() => {
+    document.getElementById("reader").innerHTML = "";
+  });
+});
     },
-    (errorMessage) => {
-      // Ignorer les erreurs mineures
+    (err) => {
+      // Ignore les erreurs de scan
     }
   ).catch((err) => {
     console.error("Erreur du scanner :", err);
   });
-  
-}
+};
+
 window.startScanner = startScanner;
 
   </script>
+  <audio id="beepSound" src="sounds/Blop.mp3" preload="auto"></audio>
 </body>
 </html>
