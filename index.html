@@ -227,9 +227,23 @@ document.getElementById("addBtn").addEventListener("click", addProduct);
       qrbox: 250
     },
     (decodedText, decodedResult) => {
-      console.log(`Scanned: ${decodedText}`);
+    fetch(`https://world.openfoodfacts.org/api/v0/product/${decodedText}.json`)
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === 1) {
+      const nom = data.product.product_name_fr || data.product.product_name || "Produit non reconnu";
+      console.log("Produit détecté :", nom);
+      document.getElementById("productName").value = nom;
+    } else {
+      console.log("Produit introuvable dans la base");
       document.getElementById("productName").value = decodedText;
-      html5QrCode.stop(); // stop after successful scan
+    }
+  })
+  .catch(err => {
+    console.error("Erreur API :", err);
+    document.getElementById("productName").value = decodedText;
+  });
+
     },
     (errorMessage) => {
       // Ignorer les erreurs mineures
